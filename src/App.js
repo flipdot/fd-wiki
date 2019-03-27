@@ -98,8 +98,7 @@ export default class App extends React.Component {
             />
             <Title>/wiki</Title>
           </Logo>
-          {sitemap &&
-            sitemap.map(element => <Sitemap item="Root" tree={element} />)}
+          {sitemap && sitemap.map(element => <Sitemap tree={element} />)}
           <BottomButton type="button">New Page</BottomButton>
         </Sidebar>
         <Content>
