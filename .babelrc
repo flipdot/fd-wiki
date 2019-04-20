@@ -1,15 +1,10 @@
 {
   "presets": [
-    "env"
+    "@babel/preset-env",
+    "@babel/preset-react"
   ],
   "plugins": [
-    "transform-runtime",
-    [
-      "transform-react-jsx",
-      {
-        "pragma": "React.createElement"
-      }
-    ],
+    "@babel/plugin-transform-runtime",
     "babel-plugin-styled-components"
   ]
 }

@@ -9,19 +9,21 @@ import { Sitemap } from "./components/Sitemap";
 import Sidebar, { Title, Logo, BottomButton } from "./components/Sidebar";
 import Content from "./components/Content";
 import GlobalStyle from "./components/GlobalStyle";
+import Header from './components/Header';
 
 export default class App extends React.Component {
   constructor() {
     super();
     this.state = {
-      content: Value.fromJSON({})
+      content: Value.fromJSON({}),
+      currentPage: '',
     };
-
-    this.navigate();
   }
 
   componentDidMount() {
     window.addEventListener("hashchange", this.navigate.bind(this));
+
+    this.navigate();
 
     getSitemap().then(sitemap => {
       this.setState({ sitemap });
@@ -66,6 +68,8 @@ export default class App extends React.Component {
   }
 
   async loadPage(page) {
+    this.setState({ currentPage: decodeURIComponent(page), content: Value.fromJSON({})});
+
     const rawPage = await getPage(page);
 
     const { frontmatter, content } = this.extractFrontmatter(rawPage);
@@ -86,7 +90,7 @@ export default class App extends React.Component {
   }
 
   render() {
-    const { content, sitemap } = this.state;
+    const { content, sitemap, currentPage } = this.state;
     return (
       <div>
         <GlobalStyle />
@@ -101,6 +105,7 @@ export default class App extends React.Component {
           {sitemap && sitemap.map(element => <Sitemap tree={element} />)}
           <BottomButton type="button">New Page</BottomButton>
         </Sidebar>
+        <Header page={currentPage} />
         <Content>
           <Editor
             value={content}

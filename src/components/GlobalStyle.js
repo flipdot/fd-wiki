@@ -11,6 +11,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   padding-left: 300px;
+  padding-top: 40px;
 }
 
 button {
@@ -21,7 +22,7 @@ button {
 
 @font-face {
   font-family: "ISOCPEUR";
-  src: url("assets/fonts/isocpeur.woff") format("woff");
+  src: url("${require('/fonts/isocpeur.woff')}") format("woff");
 }
 `;
 
