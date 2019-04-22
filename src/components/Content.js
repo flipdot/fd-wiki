@@ -32,6 +32,10 @@ const Content = styled.div`
     padding: 16px;
     margin-bottom: 16px;
     border-radius: 4px;
+
+    code {
+      padding: 0;
+    }
   }
 
   code {

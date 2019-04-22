@@ -12,7 +12,8 @@ const HeaderWrapper = styled.div`
   display: flex;
   background: #fff;
   z-index: 1000;
-  padding: 10px 10px 10px 15px;
+  padding: 5px 10px 5px 15px;
+  align-items: center;
 `;
 
 const LoginButton = styled.button``;
@@ -45,20 +46,19 @@ class Fetcher extends Component {
 }
 
 const Avatar = styled.img`
-  margin: -5px 0;
   height: 30px;
   border-radius: 15px;
 `;
 
 const UserInfo = styled.div`
   display: flex;
-  margin-left: auto;
 `;
 
 const BreadCrumbs = styled.div`
   display: flex;
   align-items: center;
   font-size: 0.9em;
+  margin-right: auto;
 `;
 
 const PathComponent = styled.div`
@@ -69,9 +69,15 @@ const PathComponent = styled.div`
   }
 `;
 
-const Header = ({ page }) => (
+const Actions = styled.div`
+  margin-right: 40px;
+  display: flex;
+`;
+
+const Header = ({ page, actions = null }) => (
   <HeaderWrapper>
     <BreadCrumbs>{page.split('/').filter(component => !!component).map(component => <PathComponent>{component}</PathComponent>)}</BreadCrumbs>
+    <Actions>{actions}</Actions>
     {isLoggedIn() ? (
       <Fetcher request={getUserData}>{userData => (<UserInfo><Avatar src={userData.avatar_url}/></UserInfo>)}</Fetcher>
     ) : (

@@ -9,6 +9,6 @@ if (window.location.hash === "#oauth") {
   handleOAuth().then(() => {
     window.location.assign("/");
   });
+} else {
+  render(<App />, document.getElementById("app"));
 }
-
-render(<App />, document.getElementById("app"));
