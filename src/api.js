@@ -1,9 +1,18 @@
 import nanoid from 'nanoid';
+import Oktokit from '@octokit/rest';
 
 const GATEKEEPER_URI = "http://localhost:9999";
 const CLIENT_ID = "0933e26d6f460754f2a6";
 const SCOPES = ['read:user', 'public_repo'];
-const API_URL = 'https://api.github.com';
+const REPO = 'wiki';
+const OWNER = 'flipdot';
+
+const octokit = new Oktokit({
+  auth: () => {
+    return getAccessToken();
+  },
+  userAgent: 'flipdot wiki v1.0',
+});
 
 function parseQueryString(query) {
   if (query.startsWith("?")) {
@@ -65,38 +74,42 @@ export function isLoggedIn() {
 }
 
 export async function getUserData() {
-  const accessToken = getAccessToken();
+  const response = await octokit.users.getAuthenticated();
+  console.debug('User data retrieved.', { response });
+  return response.data;
+}
 
-  const res = await fetch(
-    `${API_URL}/user`,
-    {
-      headers: {
-        Authorization: `token ${accessToken}`
-      }
-    }
-  );
+function normalizePage(page) {
+  if (page.startsWith('/')) {
+    return page.substring(1);
+  } else {
+    return page;
+  }
+}
 
-  return await res.json();
+function authorized() {
+  return !!getAccessToken();
 }
 
 export async function getPage(page) {
-  let rawPage;
+  page = normalizePage(page);
 
-  const accessToken = getAccessToken();
-  if (accessToken) {
-    const res = await fetch(
-      `${API_URL}/repos/flipdot/flipdot.github.io/contents${page}.md`,
-      {
-        headers: {
-          Authorization: `token ${accessToken}`,
-          Accept: "application/vnd.github.VERSION.raw"
-        }
+  let rawPage;
+  if (authorized()) {
+    const contents = await octokit.repos.getContents({
+      owner: OWNER,
+      repo: REPO,
+      path: `${page}.md`,
+      mediaType: {
+        format: 'raw'
       }
-    );
-    rawPage = await res.text();
+    });
+
+    rawPage = contents.data;
   } else {
+    // get page without authentication
     const res = await fetch(
-      `https://raw.githubusercontent.com/flipdot/flipdot.github.io/master${page}.md`
+      `https://raw.githubusercontent.com/${OWNER}/${REPO}/master/${page}.md`
     );
     rawPage = await res.text();
   }
@@ -105,21 +118,16 @@ export async function getPage(page) {
 }
 
 export async function getSitemap() {
-  const accessToken = getAccessToken();
+  const treeRes = await octokit.git.getTree({
+    owner: OWNER,
+    repo: REPO,
+    tree_sha: 'master',
+    recursive: 1,
+  });
 
-  const res = await fetch(
-    `${API_URL}/repos/flipdot/flipdot.github.io/git/trees/master?recursive=true`,
-    {
-      headers: {
-        Authorization: accessToken ? `token ${accessToken}` : undefined
-      }
-    }
-  );
-
-  const { tree: flatTree } = await res.json();
   const tree = [];
 
-  flatTree
+  treeRes.data.tree
     .filter(item => item.path.endsWith(".md"))
     .forEach(element => {
       const parts = element.path.split("/");
@@ -148,3 +156,14 @@ function insertIntoTree(tree, parts) {
     insertIntoTree(element.children, restParts);
   }
 }
+
+
+// export async function savePage(page, content) {
+//   const res = await fetch(pageUrl(page), {
+//     method: 'PUT',
+//     body: atob(content),
+//   });
+
+//   const json = await res.json();
+//   json
+// }
