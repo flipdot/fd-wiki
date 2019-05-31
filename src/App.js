@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Editor } from 'slate-react';
 import { Value } from 'slate';
-import unified from 'unified';
-import markdown from 'remark-parse';
 
 import { getPage, getSitemap } from './api';
 import { extractFrontmatter } from './frontmatter';
@@ -85,14 +83,19 @@ function MarkdownShortcutPlugin() {
     if (selection.isExpanded) return next();
 
     const { startBlock } = value;
+    const { start } = selection;
+    const leadingChars = startBlock.text.slice(0, start.offset);
 
     if (startBlock.type === 'heading') {
       event.preventDefault();
       editor.splitBlock().setBlocks({ type: 'paragraph' });
     } else if (startBlock.type === 'code') {
-      debugger;
       editor.insertText('\n');
       event.preventDefault();
+    } else if (startBlock.type === 'paragraph' && leadingChars === '```') {
+      event.preventDefault();
+      editor.moveFocusToStartOfNode(startBlock).delete();
+      editor.setBlocks({ type: 'code' });
     } else {
       return next();
     }
