@@ -25,7 +25,7 @@ function MarkdownShortcutPlugin() {
 
     if (startBlock.type !== 'paragraph') return next();
 
-    if (leadingChars.match(/^#*$/) && leadingChars.length <= 6) {
+    if (leadingChars.match(/^#+$/) && leadingChars.length <= 6) {
       // create headline
 
       event.preventDefault();
