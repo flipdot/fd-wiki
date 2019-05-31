@@ -18,7 +18,7 @@ export function valueFromMarkdown(input) {
 
 export function markdownFromValue(value) {
   const ast = mapValueNode(value.toJS().document);
-  const processor = unified().use(markdownStringify, { gfm: true, footnotes: true, fences: true });
+  const processor = unified().use(markdownStringify, { gfm: true, footnotes: true, fences: true, rule: '-' });
   return processor.stringify(ast);
 }
 
