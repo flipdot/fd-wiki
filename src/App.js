@@ -9,7 +9,7 @@ import Sidebar, { Title, Logo, BottomButton } from './components/Sidebar';
 import Content from './components/Content';
 import GlobalStyle from './components/GlobalStyle';
 import Header from './components/Header';
-import { renderNode, valueFromMarkdown, markdownFromValue } from './slateMd';
+import { renderNode, valueFromMarkdown, markdownFromValue } from './slate-md';
 import Button, { ButtonGroup } from './components/Button';
 
 function MarkdownShortcutPlugin() {
@@ -30,27 +30,30 @@ function MarkdownShortcutPlugin() {
 
       event.preventDefault();
 
-      editor.setBlocks({
-        type: 'heading',
-        data: {
-          depth: leadingChars.length,
-        },
-      });
-
-      editor.moveFocusToStartOfNode(startBlock).delete();
+      editor
+        .setBlocks({
+          type: 'heading',
+          data: {
+            depth: leadingChars.length,
+          },
+        })
+        .moveFocusToStartOfNode(startBlock)
+        .delete();
     } else if (leadingChars === '-' || leadingChars === '*') {
       // create headline
 
       event.preventDefault();
 
-      editor.setBlocks({
-        type: 'listItem',
-        data: {
-          ordered: false,
-        },
-      });
-
-      editor.moveFocusToStartOfNode(startBlock).delete();
+      editor
+        .setBlocks({
+          type: 'listItem',
+          data: {
+            ordered: false,
+          },
+        })
+        .wrapBlock({ type: 'list' })
+        .moveFocusToStartOfNode(startBlock)
+        .delete();
     } else {
       next();
     }
@@ -69,6 +72,11 @@ function MarkdownShortcutPlugin() {
 
     if (leadingChars.length === 0) {
       event.preventDefault();
+
+      if (startBlock.type === 'listItem') {
+        editor.unwrapBlock();
+      }
+
       editor.setBlocks({
         type: 'paragraph',
       });
@@ -115,6 +123,29 @@ function MarkdownShortcutPlugin() {
 
   }
 
+  function onTabDown(event, editor, next) {
+    const { value } = editor;
+    const { startBlock } = value;
+
+    if (startBlock.type === 'listItem') {
+      event.preventDefault();
+      if (event.shiftKey) {
+        editor.unwrapBlock();
+      } else {
+        // editor.wrapBlock({ type: 'listItem' });
+        // editor.wrapBlock({ type: 'list' });
+        // editor.moveToStartOfNode(startBlock);
+        editor
+          .wrapBlock({ type: 'list' })
+          .mergeNodeByKey(startBlock.key);
+        // editor.mergeNodeByPath(startBlock);
+      }
+      // editor.moveToEndOfNode(startBlock).splitBlock().setBlocks({ type: 'paragraph' });
+    } else {
+      return next();
+    }
+  }
+
   return {
     onKeyDown(event, editor, next) {
       // Return with no changes if the keypress is not '&'
@@ -122,6 +153,7 @@ function MarkdownShortcutPlugin() {
       else if (event.key === 'Backspace') onBackspace(event, editor, next);
       else if (event.key === 'Enter') onEnter(event, editor, next);
       else if (event.key === 'ArrowDown') onArrowDown(event, editor, next);
+      else if (event.key === 'Tab') onTabDown(event, editor, next);
       else next();
     },
   };
