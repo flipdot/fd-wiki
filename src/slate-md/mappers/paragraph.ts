@@ -3,7 +3,7 @@ import { List } from 'immutable';
 
 import { Handler, MdNode, Mapper } from "../mapper";
 
-class ParagraphMapper implements Handler {
+export default class ParagraphMapper implements Handler {
   fromMd(mdNode: MdNode, mapper: Mapper) {
     if (mdNode.type !== 'paragraph') return;
 
@@ -22,8 +22,4 @@ class ParagraphMapper implements Handler {
       children: valueNode.nodes.map(mapper.toMd).toJS()
     };
   }
-}
-
-export function register(mapper: Mapper) {
-  mapper.addHandler(new ParagraphMapper());
 }

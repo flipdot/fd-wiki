@@ -1,14 +1,14 @@
-import React from "react";
-import { render } from "react-dom";
+import React from 'react';
+import { render } from 'react-dom';
 
-import App from "./App";
+import App from './App';
 
-import { handleOAuth } from "./api";
+import { handleOAuth } from './api';
 
-if (window.location.hash === "#oauth") {
+if (window.location.hash === '#oauth') {
   handleOAuth().then(() => {
-    window.location.assign("/");
+    window.location.assign('/');
   });
 } else {
-  render(<App />, document.getElementById("app"));
+  render(<App />, document.getElementById('app'));
 }

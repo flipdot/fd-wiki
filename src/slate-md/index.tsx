@@ -1,88 +1,50 @@
 import React from 'react';
 
-export { valueFromMarkdown } from './mapper';
-export { markdownFromValue } from './mapper';
-
-function mapMdNode(node) {
-  switch (node.type) {
-
-    case "list":
-      return {
-        object: "block",
-        type: "list",
-        data: {
-          ordererd: node.ordered
-        },
-        nodes: node.children.map(mapMdNode)
-      };
-
-    case "listItem":
-      return {
-        object: "block",
-        type: "listItem",
-        nodes: node.children.map(mapMdNode)
-      };
-
-    case "code":
-      return {
-        object: "block",
-        type: "code",
-        data: {
-          lang: node.lang
-        },
-        nodes: [
-          {
-            object: "text",
-            text: node.value
-          }
-        ]
-      };
-
-    case "thematicBreak":
-      return {
-        object: "block",
-        type: "thematicBreak"
-      };
-
-    case "blockquote":
-      return {
-        object: "block",
-        type: "blockquote",
-        nodes: node.children.map(mapMdNode)
-      };
-
-    default:
-      console.warn('Unknown AST node.', node);
-  }
-}
+export { valueFromMarkdown, markdownFromValue } from './mapper';
 
 export function renderNode(props, editor, next) {
   const { attributes, children, node } = props;
 
   switch (node.type) {
-    case "heading": {
-      const Element = `h${node.data.get("depth")}`;
+    case 'heading': {
+      const Element = `h${node.data.get('depth')}`;
       return <Element {...attributes}>{children}</Element>;
     }
 
-    case "paragraph":
+    case 'image':
+      return (
+        <img
+          alt={node.data.get('alt')}
+          title={node.data.get('title')}
+          src={node.data.get('url')}
+          {...attributes}
+        />
+      );
+
+    case 'paragraph':
       return <p {...attributes}>{children}</p>;
 
-    case "code":
+    case 'strong':
+      return <strong {...attributes}>{children}</strong>;
+
+    case 'emphasis':
+      return <em {...attributes}>{children}</em>;
+
+    case 'code':
       return (
         <pre>
           <code {...attributes}>{children}</code>
         </pre>
       );
 
-    case "link":
+    case 'link':
       return (
         <a
-          title={node.data.get("title")}
-          href={node.data.get("url")}
+          title={node.data.get('title')}
+          href={node.data.get('url')}
           onClick={() => {
             //window.open(node.data.get("url"), "_blank");
-            window.location.assign(node.data.get("url"));
+            window.location.assign(node.data.get('url'));
           }}
           {...attributes}
         >
@@ -90,16 +52,35 @@ export function renderNode(props, editor, next) {
         </a>
       );
 
-    case "inlineCode":
+    case 'inlineCode':
       return <code {...attributes}>{children}</code>;
 
-    case "list": {
-      const Element = node.data.ordererd ? "ol" : "ul";
-      return <Element>{children}</Element>;
+    case 'list': {
+      const Element = node.data.ordererd ? 'ol' : 'ul';
+      return <Element {...attributes}>{children}</Element>;
     }
 
-    case "listItem":
-      return <li>{children}</li>;
+    case 'listItem':
+      if (node.data.get('checked') != null) {
+        return (
+          <li {...attributes}>
+            <input
+              checked={node.data.get('checked')}
+              type="checkbox"
+              onChange={e => {
+                debugger;
+                editor.setNodeByKey(node.key, {
+                  type: 'listItem',
+                  data: { ...node.data, checked: e.currentTarget.checked },
+                });
+              }}
+            />
+            {children}
+          </li>
+        );
+      } else {
+        return <li {...attributes}>{children}</li>;
+      }
 
     default:
       return next();

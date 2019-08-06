@@ -2,7 +2,7 @@ import { Node, Text } from "slate";
 
 import { Handler, MdNode, Mapper } from "../mapper";
 
-class TextMapper implements Handler {
+export default class TextMapper implements Handler {
   fromMd(mdNode: MdNode, mapper: Mapper) {
     if (mdNode.type !== 'text') return;
 
@@ -19,8 +19,4 @@ class TextMapper implements Handler {
       value: valueNode.text,
     };
   }
-}
-
-export function register(mapper: Mapper) {
-  mapper.addHandler(new TextMapper());
 }

@@ -1,4 +1,3 @@
-import React from "react";
 import styled from "styled-components";
 
 const Content = styled.div`
@@ -27,6 +26,17 @@ const Content = styled.div`
     margin: 0 0 16px;
   }
 
+  a {
+    border-bottom: 2px solid #F5C600;
+    text-decoration: none;
+    color: #000;
+    cursor: pointer;
+
+    &:hover {
+      color: #666;
+    }
+  }
+
   pre {
     background: #f2f5f7;
     padding: 16px;
@@ -49,11 +59,24 @@ const Content = styled.div`
   ul,
   ol {
     padding-left: 16px;
+    margin-bottom: 16px;
   }
 
   li {
+    position: relative;
+
     > p {
       margin-bottom: 0;
+    }
+
+    > ul {
+      margin-bottom: 0;
+    }
+
+    > input {
+      position: absolute;
+      left: -20px;
+      top: 6px;
     }
   }
 `;

@@ -1,31 +1,31 @@
 import { Node, Inline } from "slate";
-import { List } from 'immutable';
 
 import { Handler, MdNode, Mapper } from "../mapper";
 
-export default class LinkMapper implements Handler {
+export default class ImageMapper implements Handler {
   fromMd(mdNode: MdNode, mapper: Mapper) {
-    if (mdNode.type !== 'link') return;
+    if (mdNode.type !== 'image') return;
 
     return Inline.create({
-      type: "link",
-      nodes: List(mdNode.children.map(mapper.fromMd)),
+      type: "image",
+      // nodes: List(mdNode.children.map(mapper.fromMd)),
       data: {
         url: mdNode.url,
-        title: mdNode.title
+        alt: mdNode.alt,
+        title: mdNode.title,
       }
     });
   }
 
   toMd(valueNode: Node, mapper: Mapper) {
     if (valueNode.object !== 'inline') return;
-    if (valueNode.type !== 'link') return;
+    if (valueNode.type !== 'image') return;
 
     return {
-      type: 'link',
+      type: 'image',
       url: valueNode.data.get('url'),
+      alt: valueNode.data.get('alt'),
       title: valueNode.data.get('title'),
-      children: valueNode.nodes.map(mapper.toMd).toJS(),
     };
   }
 }

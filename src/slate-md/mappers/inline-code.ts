@@ -3,14 +3,14 @@ import { List } from 'immutable';
 
 import { Handler, MdNode, Mapper } from "../mapper";
 
-class InlineCodeMapper implements Handler {
+export default class InlineCodeMapper implements Handler {
   fromMd(mdNode: MdNode, mapper: Mapper) {
     if (mdNode.type !== 'inlineCode') return;
 
     return Inline.create({
       type: "inlineCode",
       nodes: List([
-        new Text({
+        Text.create({
           text: mdNode.value,
         })
       ]),
@@ -26,8 +26,4 @@ class InlineCodeMapper implements Handler {
       value: valueNode.text,
     };
   }
-}
-
-export function register(mapper: Mapper) {
-  mapper.addHandler(new InlineCodeMapper());
 }

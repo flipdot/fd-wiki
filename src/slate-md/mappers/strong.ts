@@ -3,28 +3,22 @@ import { List } from 'immutable';
 
 import { Handler, MdNode, Mapper } from "../mapper";
 
-export default class LinkReferenceMapper implements Handler {
+export default class StrongMapper implements Handler {
   fromMd(mdNode: MdNode, mapper: Mapper) {
-    if (mdNode.type !== 'linkReference') return;
+    if (mdNode.type !== 'strong') return;
 
     return Inline.create({
-      type: "linkReference",
+      type: "strong",
       nodes: List(mdNode.children.map(mapper.fromMd)),
-      data: {
-        identifier: mdNode.identifier,
-        label: mdNode.label
-      }
     });
   }
 
   toMd(valueNode: Node, mapper: Mapper) {
     if (valueNode.object !== 'inline') return;
-    if (valueNode.type !== 'linkReference') return;
+    if (valueNode.type !== 'strong') return;
 
     return {
-      type: 'linkReference',
-      identifier: valueNode.data.get('identifier'),
-      label: valueNode.data.get('label'),
+      type: 'strong',
       children: valueNode.nodes.map(mapper.toMd).toJS(),
     };
   }
