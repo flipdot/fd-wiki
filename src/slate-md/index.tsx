@@ -1,9 +1,10 @@
 import React from 'react';
+import console = require('console');
 
 export { valueFromMarkdown, markdownFromValue } from './mapper';
 
 export function renderNode(props, editor, next) {
-  const { attributes, children, node } = props;
+  const { attributes, children, node, isFocused } = props;
 
   switch (node.type) {
     case 'heading': {
@@ -14,10 +15,11 @@ export function renderNode(props, editor, next) {
     case 'image':
       return (
         <img
+          className={isFocused ? 'focused' : undefined}
+          {...attributes}
           alt={node.data.get('alt')}
           title={node.data.get('title')}
           src={node.data.get('url')}
-          {...attributes}
         />
       );
 
@@ -38,13 +40,43 @@ export function renderNode(props, editor, next) {
       );
 
     case 'link':
+      let url = node.data.get('url');
+      let externalUrl = false;
+
+      if (url.includes('://')) {
+        externalUrl = true;
+      } else {
+        if (url.startsWith('/')) {
+          // fix absolute links
+          url = `/#${node.data.get('url')}`;
+        } else {
+          // fix relative links
+          const parts = window.location.toString().split('/');
+          const strippedLocation = parts.slice(0, parts.length - 1).join('/');
+          url = `${strippedLocation}/${node.data.get('url')}`;
+        }
+
+        // strip file ending when it's another page
+        if (url.endsWith('.md')) {
+          url = url.substr(0, url.length - 3);
+        }
+      }
+
       return (
         <a
           title={node.data.get('title')}
-          href={node.data.get('url')}
+          href={url}
           onClick={() => {
-            //window.open(node.data.get("url"), "_blank");
-            window.location.assign(node.data.get('url'));
+            console.log(window.getSelection());
+            // allow links to be selected without opening them
+            if (window.getSelection().isCollapsed) {
+              if (externalUrl) {
+                // open external url in new tab
+                window.open(url, "_blank");
+              } else {
+                window.location.assign(url);
+              }
+            }
           }}
           {...attributes}
         >

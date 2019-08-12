@@ -11,7 +11,7 @@ const HeaderWrapper = styled.div`
 
   display: flex;
   background: #fff;
-  z-index: 1000;
+  z-index: 50;
   padding: 5px 10px 5px 15px;
   align-items: center;
 `;

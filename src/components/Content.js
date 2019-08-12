@@ -48,6 +48,15 @@ const Content = styled.div`
     }
   }
 
+  img {
+    max-width: 100%;
+    max-height: 600px;
+
+    &.focused {
+      box-shadow: 0 0 0 4px rgba(0, 0, 0, .1);
+    }
+  }
+
   code {
     font-family: Monaco;
     font-size: 0.9em;
