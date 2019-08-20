@@ -12,7 +12,7 @@ const octokit = new Oktokit({
   auth: () => {
     return getAccessToken();
   },
-  userAgent: 'flipdot wiki v1.0',
+  userAgent: 'flipdot wiki',
 });
 
 function parseQueryString(query) {
